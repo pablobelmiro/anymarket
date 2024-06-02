@@ -314,3 +314,51 @@ class Pedido:
             return {
                 'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
             } 
+    
+    @staticmethod
+    def ordersPutEnviaXml(token: str, idOrder: int = 0, xml: str=None):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}/nfe'
+        
+        if idOrder > 0 and xml is not None:
+            response = httpx.put(endpoint, headers={f'gumgaToken': token,
+                                                    'Content-Type': 'application/xml'}, data=xml)
+            
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
+            } 
+
+    @staticmethod
+    def ordersPostfiscalDocument(token: str, idOrder: int = 0, fiscalDocument: str=None):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}/fiscalDocument'
+        
+        if idOrder > 0 and fiscalDocument is not None:
+            response = httpx.post(endpoint, headers={f'gumgaToken': token,
+                                                    "Content-Type": "multipart/form-data; boundary=---011000010111000001101001"}, data=fiscalDocument)
+            
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
+            } 
