@@ -1,2 +1,5 @@
 testes.ipynb
 __pycache__
+build
+dist
+Anymarket.egg-info
