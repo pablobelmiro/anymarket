@@ -10,7 +10,7 @@ class tests:
 class errorAnymarket:
     msg = None
     statuscode = None
-    def __init__(self, msg, statuscode):
+    def __init__(self, msg, statuscode) -> None:
         self.msg = msg
         self.statuscode = statuscode
         
@@ -21,18 +21,12 @@ class errorAnymarket:
 
 class Pedido:
     token = None
-    listOrders = {
-            'orders': []
-        }
-    
-    def __init__(self, token) -> None:
-        self.token = token
         
     def _trataRetorno(self, params, response, listOrders):
         if response.status_code == 200: 
             data = {}
+            response.encoding = 'utf-8'
             responsedict = json.loads(response.text)
-            print(f"totalPages: {responsedict['page']['totalPages']}")
             totalPaginas = responsedict['page']['totalPages']
             content = responsedict.get('content', None)
             if content is not None:
@@ -50,12 +44,9 @@ class Pedido:
             errorMsg = errorAnymarket.throwError(response.text, response.status_code)    
             print(errorMsg)
 
-    def _requisicao(self, params, listOrders):
-        print('================================')
-        print(f'params: {params}')
+    def _requisicao(self, token, params, listOrders):
         endpoint = 'http://api.anymarket.com.br/v2/orders'
         response = httpx.get(endpoint, headers={f'gumgaToken': token}, params=params, timeout=None)
-        print(f'response: {response}')
         # print(f'response.text: {response.text}')
         
         totalPaginas = self._trataRetorno(params, response, listOrders)
@@ -66,8 +57,11 @@ class Pedido:
             return
     
     @staticmethod
-    def getPedidos(token, createdAfter=None, createdBefore=None, marketplaceId=None, offset=0, marketplace=None, status=None):
-        pedido_instance = Pedido(token)
+    def getPedidos(token: str, createdAfter: str=None, createdBefore: str=None, marketplaceId: int=None, offset: int=0, marketplace: str=None, status: str=None, days: int=7):
+        listOrders = {
+            'orders': []
+        }
+        pedido_instance = Pedido()
         params = {}
         
         params['Content-type'] = 'application/json'
@@ -98,7 +92,7 @@ class Pedido:
             createdBefore = dataAtual - timedelta(days=7)
         
         # Iniciando dentro do loop de 7 dias
-        for i in range(1, 7):
+        for i in range(1, days):
             createdAfter = dataAtual - timedelta(i)
             createdBefore = dataAtual - timedelta(i - 1)
             fusoHorario = timezone(timedelta(hours=-23, minutes=-59))
@@ -111,8 +105,7 @@ class Pedido:
             params['createdBefore'] = createdBeforeFormatted
             
             
-            totalPaginas = pedido_instance._requisicao(params, pedido_instance.listOrders)
-            print(f'total paginas: {totalPaginas}')
+            totalPaginas = pedido_instance._requisicao(token, params, listOrders)
             
             if totalPaginas > 1:
                 # Verificando se possui mais páginas
@@ -120,6 +113,61 @@ class Pedido:
                     print(f'offset atual: {offset}')
                     offset += 100
                     params['offset'] = f'offset'
-                    pedido_instance._requisicao(params, pedido_instance.listOrders)
+                    pedido_instance._requisicao(token, params, listOrders)
         
-        return pedido_instance.listOrders
+        return listOrders
+    
+    @staticmethod
+    def getPedido(token: str, idOrder: int):
+        data = {}
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}'
+        
+        response = httpx.get(endpoint, headers={f'gumgaToken': token})
+        
+        if response.status_code == 200: 
+            data = {
+                    'content': json.loads(response.text)
+                }
+        else:
+            if response.status_code == 404: 
+                errorMsg = errorAnymarket.throwError('Not Found!', response.status_code)  
+                print(errorMsg)  
+                data = {
+                    'idOrder': idOrder,
+                    'content': 'Not Found!'
+                }
+            else:
+                errorMsg = errorAnymarket.throwError(response.text, response.status_code)    
+                print(errorMsg)
+                data = {
+                    'idOrder': idOrder,
+                    'content': json.loads(response.text)
+                }
+         
+        return data
+    
+    @staticmethod 
+    def getXmlNfe(token: str, idOrder: int, type: str='sale'):
+        data = {}
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}/nfe/type/{type}'
+        
+        response = httpx.get(endpoint, headers={f'gumgaToken': token})
+        response.encoding = 'utf-8'
+        
+        if response.status_code == 200: 
+            responsedict = json.loads(response.text)
+            data = {
+                    'type': responsedict['type'],
+                    'content': responsedict['url']
+                }
+        else:
+            errorMsg = errorAnymarket.throwError('Not Found!', response.status_code)  
+            responsedict = json.loads(response.text)
+            print(errorMsg)  
+            data = {
+                'code': responsedict['code'],
+                'content': responsedict['message']
+            }
+         
+        return data
+        
