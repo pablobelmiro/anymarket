@@ -170,4 +170,147 @@ class Pedido:
             }
          
         return data
+    
+    @staticmethod
+    def postOrder(token: str, payload: dict= None):
+        endpoint ='https://api.anymarket.com.br/v2/orders'
         
+        if payload is not None:
+            response = httpx.post(endpoint, headers={f'gumgaToken': token}, data=json.dumps(payload))
+            
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'Payload is null!'
+            }
+    
+    @staticmethod
+    def putOrderPago(token: str, idOrder: int = 0):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}(Pago)'
+        
+        if idOrder > 0:
+            payload = {
+                "status": "PAID_WAITING_SHIP"
+            }
+        
+            response = httpx.put(endpoint, headers={f'gumgaToken': token}, data=json.dumps(payload))
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0!'
+            }
+    
+    @staticmethod
+    def putOrderFaturado(token: str, idOrder: int = 0, payload: dict=None):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}(Faturado)'
+        
+        if idOrder > 0 and payload is not None:
+            response = httpx.put(endpoint, headers={f'gumgaToken': token}, data=json.dumps(payload))
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
+            }
+            
+    @staticmethod
+    def putOrderEmTransito(token: str, idOrder: int = 0, payload: dict=None):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}(Enviado - Em Transito)'
+        
+        if idOrder > 0 and payload is not None:
+            response = httpx.put(endpoint, headers={f'gumgaToken': token}, data=json.dumps(payload))
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
+            }
+    
+    @staticmethod
+    def putOrderConcluido(token: str, idOrder: int = 0, payload: dict=None):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}(Concluido)'
+        
+        if idOrder > 0 and payload is not None:
+            response = httpx.put(endpoint, headers={f'gumgaToken': token}, data=json.dumps(payload))
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
+            }    
+            
+    @staticmethod
+    def putOrderCancelado(token: str, idOrder: int = 0, cancelDescription: str=None):
+        endpoint = f'https://api.anymarket.com.br/v2/orders/{idOrder}(Cancelado)'
+        
+        if idOrder > 0 and cancelDescription is not None:
+            
+            payload = {
+                "cancelDetails": cancelDescription,
+                "status": "CANCELED"
+            }
+            
+            response = httpx.put(endpoint, headers={f'gumgaToken': token}, data=payload)
+            
+            if response.status_code == 200:
+                data = {'order': None}
+                responsedict = json.loads(response.text)
+                data['order'] = responsedict
+                return data
+                
+            else:
+                data = {'error': None}
+                responsedict = json.loads(response.text)
+                data['error'] = responsedict
+                return data
+        else:
+            return {
+                'error': 'idOrder deve ser diferente de 0 e payload deve conter dados válidos conforme body de requisição descrito no documentação da api!'
+            } 
