@@ -1,3 +1,11 @@
 pip install --upgrade setuptools wheel twine
 python setup.py sdist bdist_wheel
 twine upload dist/*
+
+Como subir as credenciais direto no terminal? 
+- Colocar o token no lugar de <seu_token_de_API>
+twine upload dist/* -u __token__ -p <seu_token_de_API>
+
+Configurando twin para ler o arquivo .pypirc
+set TWINE_CONFIG_FILE=<seu_diretorio>
+exemplo: set TWINE_CONFIG_FILE=D:\fonts_pablo\pipProjects\Anymarket\.pypirc

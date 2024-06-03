@@ -3,3 +3,4 @@ __pycache__
 build
 dist
 Anymarket.egg-info
+.pypirc
