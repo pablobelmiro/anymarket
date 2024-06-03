@@ -4,7 +4,12 @@
 #Installation
 To install this library, use pip:
 
-`pip install anymarket-api-client`
+`pip install Anymarket`
+
+#How to import
+`from Anymarket import *|<modules>`
+##Modules
+    * Pedido
 
 ###github project
 https://github.com/pablobelmiro/anymarket
