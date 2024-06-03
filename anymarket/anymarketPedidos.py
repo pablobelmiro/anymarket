@@ -2,11 +2,6 @@ import json
 import httpx
 from datetime import datetime, timedelta, timezone
 
-class tests:
-    @staticmethod
-    def test():
-        return 'ok'
-
 class errorAnymarket:
     msg = None
     statuscode = None
